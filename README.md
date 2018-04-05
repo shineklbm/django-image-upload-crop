@@ -14,7 +14,7 @@ A widget for image upload with features like preview, zoom, crop functionality
 
 ### Frontend
 
-I am using webpack and laravel-mix for asset management, please feel free to play with the webpack.mix.js file and composer.js file for frontend changes. Please make sure that you run "npm install" and "npm run dev" to make the changes work.
+I am using webpack and laravel-mix for asset management, please feel free to play with the webpack.mix.js file and composer.js file for frontend changes. Please make sure that you run "npm install" and "npm run dev" to update the frontend changes.
 
 Please feel free to contact me on shine@richkenmedia.com for any queries you may have.
 
