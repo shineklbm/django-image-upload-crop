@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load staticfiles%}
+{% block content_block %}
+    {{ form.errors }}
+    <!-- Upload form -->
+    <form method="post" enctype="multipart/form-data" id="profile_form">
+        {% csrf_token %}
+        {{ form.name }}
+        {{ form.image }}
+        {% for hidden in form.hidden_fields %}
+            {{ hidden }}
+        {% endfor %}
+        <input type="submit" value="Save">
+    </form>
+
+    <!-- Popup for image resize and preload -->
+    <div class="modal fade" id="model-crop">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title">Crop Image</h4>
+                </div>
+                <div class="modal-body">
+                    <img src="" id="image" style="max-width: 100%;">
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group pull-left" role="group">
+                        <button type="button" class="btn btn-default zoon-in">
+                            <span class="glyphicon glyphicon-zoom-in">+</span>
+                        </button>
+                        <button type="button" class="btn btn-default zoon-out">
+                            <span class="glyphicon glyphicon-zoom-out">-</span>
+                        </button>
+                    </div>
+                    <button type="button" class="btn btn-primary crop-and-upload">Crop and upload</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Display all images available, guys please note that I am pulling all records you might need to fine tune it. -->
+    {% for profile in profile_list %}
+        <img src="{{media_url}}{{ profile.image.url }}" class="thumbnail">
+    {% endfor %}
+{% endblock %}
+
+
+{% block script_block %}
+    <script>
+        jQuery(document).ready(function ($) {
+            /* Model with Preview Option */
+            $("#id_image").change(function () {
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function (e) {
+                        $("#image").attr("src", e.target.result);
+                        $("#model-crop").modal("show");
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+
+            /* Cropper Box Script */
+            var $image = $("#image");
+            var cropBoxData;
+            var canvasData;
+            $("#model-crop").on("shown.bs.modal", function () {
+                $image.cropper({
+                    viewMode: 1,
+                    aspectRatio: 1 / 1,
+                    minCropBoxWidth: 200,
+                    minCropBoxHeight: 200,
+                    ready: function () {
+                        $image.cropper("setCanvasData", canvasData);
+                        $image.cropper("setCropBoxData", cropBoxData);
+                    }
+                });
+            }).on("hidden.bs.modal", function () {
+                cropBoxData = $image.cropper("getCropBoxData");
+                canvasData = $image.cropper("getCanvasData");
+                $image.cropper("destroy");
+            });
+
+            $(".zoon-in").click(function () {
+                $image.cropper("zoom", 0.1);
+            });
+
+            $(".zoon-out").click(function () {
+                $image.cropper("zoom", -0.1);
+            });
+
+            /* Posting values to server */
+            $(".crop-and-upload").click(function () {
+                var cropData = $image.cropper("getData");
+                $("#id_x").val(cropData["x"]);
+                $("#id_y").val(cropData["y"]);
+                $("#id_height").val(cropData["height"]);
+                $("#id_width").val(cropData["width"]);
+                $("#profile_form").submit();
+            });
+
+        });
+    </script>
+{% endblock %}

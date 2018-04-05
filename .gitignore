@@ -99,3 +99,14 @@ ENV/
 
 # mypy
 .mypy_cache/
+
+*.pyc
+*~
+__pycache__
+*.sqlite3
+.DS_Store
+.vscode
+/assets/uploads
+/node_modules
+package-lock.json
+/imgcrop/settings/local.*
